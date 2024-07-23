@@ -1,6 +1,7 @@
 import { z } from "zod"
+import { isEmailExisting } from "./helpers"
 
-const passwordSchema = z.string()
+export const passwordSchema = z.string()
 .min(6, {message: "This field must have more than 6 characters"})
 .max(50, {message: "Your password exceeded the limit"})
 // .refine((password) => /^[a-z0-9]+$/i.test(password), {message: "This field must have a Uppercase, Lowercase, Number, Special Character"})
@@ -12,6 +13,6 @@ const passwordSchema = z.string()
 export const formSchema = z.object({
     username: z.string().min(1, {message: "This field is mandatory"}).max(50, {message: "Your username exceeded the limit"}),
     password: passwordSchema,
-    email: z.string().min(1, {message: "This field is mandatory"}).email("Please provide a valid email."),
+    email: z.string().min(1, {message: "This field is mandatory"}).email("Please provide a valid email.").refine(async (value) => await isEmailExisting(value),{message: 'Email already used.'}),
     confirm_password: z.string().min(6, {message: "This field must have more than 6 characters"}).max(50, {message: "Your password exceeded the limit"}),
 }).refine((data) => data.password === data.confirm_password, {path:['confirm_password'], message: "Passwords do not match"})

@@ -20,12 +20,13 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Eye, EyeOff, Facebook, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { z } from 'zod'
+import { useRouter } from 'next/navigation'
 
 const RegisterForm = () => {
     const [isPasswordShown, setIsPasswordShown] = React.useState<boolean>(false)
     const [isConfirmPasswordShown, setIsConfirmPasswordShown] = React.useState<boolean>(false)
     const [isAcceptedTerms, setIsAcceptedTerms] = React.useState<boolean>(false)
-
+    const router = useRouter()
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -37,11 +38,11 @@ const RegisterForm = () => {
         }
     })
     const isSubmitting = form.formState.isSubmitting
-    const onSubmit = (values: z.infer<typeof formSchema>) => {
+    const onSubmit = async (values: z.infer<typeof formSchema>) => {
 
         try{
             if(isAcceptedTerms){
-                fetch('/api/register', {
+                await fetch('/api/register', {
                     method: 'POST',
                     headers: {
                         "Content-Type": "application/json"
@@ -50,11 +51,12 @@ const RegisterForm = () => {
                 })
                 .then((response)=> {
                     if(!response.ok) return
-                    response.json()
+                    return response.json()
                 })
                 .then((message) => {
+                    toast.success(message)
                     form.reset()
-                    console.log('message', message)
+                    router.push('/conversations')
                 })
 
             }else{

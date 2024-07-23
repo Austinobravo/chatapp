@@ -8,11 +8,11 @@ export async function POST(request: Request, response: Response){
     const {email, username, password} = data
 
 
-    const parsedForm = formSchema.safeParse(data)
-
+    const parsedForm = await formSchema.safeParseAsync(data)
     if(!parsedForm.success){
         return NextResponse.json(parsedForm.error, {status: 403})
     }
+    const newPassword = await hashedPassword(password)
 
    try{
 
@@ -20,7 +20,7 @@ export async function POST(request: Request, response: Response){
         data: {
             email,
             username,
-            password: hashedPassword(password), 
+            password:newPassword , 
         }
     })
     return NextResponse.json('Success', {status: 201})

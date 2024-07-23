@@ -7,7 +7,7 @@ async function main() {
         data:{
             username: "admin",
             email: 'admin@gmail.com',
-            password: hashedPassword('password')
+            password: await hashedPassword('password')
         }
     })
 
