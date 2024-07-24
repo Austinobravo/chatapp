@@ -21,3 +21,11 @@ export const isEmailExisting = async (email: string) => {
     })
     return !!!gottenEmail
 }
+export const isEmailNotExisting = async (email: string) => {
+    const gottenEmail = await prisma.user.findUnique({
+        where:{
+            email
+        }
+    })
+    return !!gottenEmail
+}

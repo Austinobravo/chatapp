@@ -17,10 +17,6 @@ export async function GET(request:NextRequest, {params}: {params:{userId: string
             where: {
                 id: userId
             },
-            include:{
-                conversations: true,
-                // friends: true
-            },
             
         })
         console.log('user', user)

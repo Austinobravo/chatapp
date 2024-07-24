@@ -12,20 +12,6 @@ const page = () => {
         <ItemsList title='Friends' action={<FriendInput/>}>
               <p className='text-center text-primary'>Friends</p>
               <FriendCard/>
-              <FriendCard/>
-              <FriendCard/>
-              <FriendCard/>
-              <FriendCard/>
-              <FriendCard/>
-              <FriendCard/>
-              <FriendCard/>
-              <FriendCard/>
-              <FriendCard/>
-              <FriendCard/>
-              <FriendCard/>
-              <FriendCard/>
-              <FriendCard/>
-              <FriendCard/>
         </ItemsList>
         <ConversationFallback/>
     </div>

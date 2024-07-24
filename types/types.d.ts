@@ -1,3 +1,5 @@
+
+
 type UserType = {
     id: string
     email: string
@@ -5,6 +7,7 @@ type UserType = {
     image?: string
 
     friends: Array[]
+    requests: Array[]
     conversations: Array[]
     createdAt: string
 }
@@ -15,4 +18,14 @@ type ConversationType = {
 
     userId: string
     createdAt: string
+}
+
+type RequestType = {
+    id:string
+
+    isaccepted: boolean
+    sender: string
+    receiver: string
+    user: UserType
+
 }

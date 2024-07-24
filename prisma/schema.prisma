@@ -21,10 +21,11 @@ model User{
   image String?
   password String 
 
-  requests Requests[]
+  requestsReceived Requests[] @relation("ReceiverRelation")
+  requestsSent Requests[] @relation("SenderRelation")
   friends Friends[]
   messages Message[]
-  conversations Conversations[]
+
   conversationsMembers ConversationsMembers[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -34,10 +35,12 @@ model Requests{
   id String @id @default(uuid())
 
   isaccepted Boolean @default(false)
-  sender String @unique
-  receiver String
-  user User @relation(fields: [receiver], references: [email], onDelete: Cascade)
+  sender String 
+  receiver String 
 
+  userSender User @relation("SenderRelation", fields: [sender], references: [id], onDelete: Cascade)
+  userReceiver User @relation("ReceiverRelation", fields: [receiver], references: [id], onDelete: Cascade)
+  conversation Conversations[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -60,8 +63,8 @@ model Conversations{
   id String @id @default(uuid())
   name String?
 
-  userId String
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  requestId String
+  request Requests @relation(fields: [requestId], references: [id], onDelete: Cascade)
   friends Friends[]
   lastMessage String?
   isGroup Boolean @default(false)

@@ -10,12 +10,12 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 
 import { toast } from 'sonner'
-import { isEmailExisting } from '@/lib/helpers'
+import { isEmailNotExisting } from '@/lib/helpers'
 
 const FriendInput = () => {
     const [open, setOpen] = React.useState<boolean>(false)
     const formSchema = z.object({
-        email: z.string().min(1, {message: "This field is mandatory"}).email('Please enter a valid email.').refine((value) => !isEmailExisting(value), {message: 'User not found'}),
+        email: z.string().min(1, {message: "This field is mandatory"}).email('Please enter a valid email.').refine((value) => isEmailNotExisting(value), {message: 'User not found'}),
       })
       const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -34,13 +34,21 @@ const FriendInput = () => {
                 body: JSON.stringify(values)
             })
             .then((response)=> {
-                if(!response.ok) return
+                if(!response.ok){
+                    toast.error(response.statusText)
+                    return
+                }
                 return response.json()
             })
             .then((message) => {
-                toast.success(message)
-                form.reset()
-                setOpen(!open)
+                if(message){
+                    toast.success(message)
+                    form.reset()
+                    setOpen(!open) 
+                }
+            })
+            .catch((error) => {
+                toast.error(error)
             })
 
         }
@@ -82,7 +90,7 @@ const FriendInput = () => {
         </Form>
         </AlertDialogContent>
 
-  </AlertDialog>
+    </AlertDialog>
   )
 }
 

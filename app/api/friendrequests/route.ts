@@ -6,7 +6,10 @@ export async function POST(request: Request, response: NextApiResponse){
     const data = await request.json()
     const accessingUser = await getCurrentUser()
 
-
+    
+    if(data.email === accessingUser?.email){
+        return NextResponse.json('Forbidden', {status: 403})
+    }
 
     const existingUser = await prisma.user.findUnique({
         where: {
@@ -17,10 +20,10 @@ export async function POST(request: Request, response: NextApiResponse){
         return NextResponse.json('No user found', {status: 404})
     }
 
-    const existingRequestSender = await prisma.requests.findUnique({
+    const existingRequestSender = await prisma.requests.findFirst({
         where: {
             sender: accessingUser?.id,
-            receiver: data.email
+            receiver: existingUser.id
         }
     })
     if(existingRequestSender){
@@ -30,7 +33,7 @@ export async function POST(request: Request, response: NextApiResponse){
     const existingRequestReceiver = await prisma.user.findUnique({
         where: {
             email: data.email,
-            requests:{
+            requestsReceived:{
                 some:{
                     sender: accessingUser?.id
                 }
@@ -46,7 +49,7 @@ export async function POST(request: Request, response: NextApiResponse){
     const alreadyFriendsWithSender = await prisma.friends.findUnique({
         where: {
             sender: accessingUser?.id,
-            receiver: data.email
+            receiver: existingUser.id
         }
     })
     
@@ -73,36 +76,16 @@ export async function POST(request: Request, response: NextApiResponse){
         await prisma.requests.create({
             data:{
                 sender: accessingUser?.id as string,
-                receiver: data.email,
+                receiver: existingUser.id,
             }
         })
         
-        // const newConversation = await prisma.conversations.create({
-        //     data:{
-        //         userId: accessingUser?.id as string,
-        //         isGroup: false
-        //     }
-        // })
-        
-        // await prisma.friends.create({
-        //     data:{
-        //         isaccepted: true,
-        //         sender: accessingUser?.id as string,
-        //         receiver: data.email,
-        //         conversationId: newConversation.id
-        //     }
-        // }) 
-        // await prisma.conversationsMembers.create({
-        //     data:{
-        //         userId: accessingUser?.id as string,
-        //         conversationId: newConversation.id
-        //     }
-        // }) 
 
         return NextResponse.json('Friend request sent', {status: 201})
 
     }
     catch(error){
+        console.log('err', error)
         return NextResponse.json('An error occured', {status: 505})
     }
     

@@ -51,8 +51,8 @@ const LoginForm = (props: Props) => {
         try{
             const response = await signIn('credentials',{
                 redirect:false,
-                email: email,
-                password: password,
+                email: email.trim(),
+                password: password.trim(),
                 callbackUrl: callbackUrl
             })
 
@@ -117,7 +117,7 @@ const LoginForm = (props: Props) => {
                             <FormItem className='pt-3 !space-y-0 relative'>
                                 <FormLabel className="text-muted-foreground">Password</FormLabel>
                                 <FormControl>
-                                    <Input type={isPasswordShown ? 'text' : 'password'} placeholder='Your Password' {...field} defaultValue={'!Password1'} className='bg-transparent focus:border-l-green-700 ring-offset-transparent focus-visible:!ring-offset-0 focus-visible:!ring-0 border-l-8 border-l-blue-500  ' />
+                                    <Input type={isPasswordShown ? 'text' : 'password'} placeholder='Your Password' {...field}  className='bg-transparent focus:border-l-green-700 ring-offset-transparent focus-visible:!ring-offset-0 focus-visible:!ring-0 border-l-8 border-l-blue-500  ' />
                                 </FormControl>
                                 <span className='absolute right-5 top-[44px] cursor-pointer' onClick={()=> setIsPasswordShown(!isPasswordShown)}>
                                 {isPasswordShown 
@@ -128,6 +128,7 @@ const LoginForm = (props: Props) => {
                                     }
                                     </span>
                                 <FormMessage className='text-red-500'/>
+                                <p>!Password1</p>
                             </FormItem>
                         )}
                     />
