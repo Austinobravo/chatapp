@@ -2,7 +2,7 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { zodResolver } from '@hookform/resolvers/zod'
-import React from 'react'
+import React, { useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import {
@@ -20,14 +20,17 @@ import { Eye, EyeOff, Facebook, Loader2 } from 'lucide-react'
 import { passwordSchema } from '@/lib/validation'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
-import {signIn} from 'next-auth/react'
+import {signIn, useSession} from 'next-auth/react'
+import InitUser from '@/hooks/store/initUser'
 
 type Props = {}
 
 const LoginForm = (props: Props) => {
     const [isPasswordShown, setIsPasswordShown] = React.useState<boolean>(false)
+    const [userDetails, setUserDetails] = React.useState({} as UserType)
     const callbackUrl = useSearchParams().get('callbackUrl') || '/conversations'
     const router = useRouter()
+    const {data: session} = useSession()
     const formSchema = z.object({
         email: z.string().min(1, {message: "This field is mandatory"}).email('Please enter a valid email.'),
         password: passwordSchema
@@ -56,14 +59,42 @@ const LoginForm = (props: Props) => {
             if(response?.error) return toast.error(response.error)
             if(response?.ok){
                 toast.success('Login Successful')
-                return router.push('/conversations')
+                console.log('res', session)
+                if(session){
+                    await getUser(session.user)
+                    return router.push('/conversations') 
+                }
             }
-
+            
         }catch(error){
             toast.error(`${error}`)
         }
     }
-  return (
+    
+    
+    const getUser:any = async (userSession: any) =>  {
+        await fetch(`/api/users/${userSession?.id}`, {
+            method: 'GET'
+        })
+        .then((response) => {
+            if(!response.ok){
+                throw new Error('Data not found')
+                }
+                return response.json()
+                
+            })
+            .then((data: UserType) => {
+                setUserDetails(data)
+            })
+        }
+        
+        
+        
+        return (
+            <>
+            {Object.entries(userDetails).length > 0 &&
+                <InitUser user={userDetails}/>
+            }
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className='pl-4'>
                     <FormField
@@ -86,7 +117,7 @@ const LoginForm = (props: Props) => {
                             <FormItem className='pt-3 !space-y-0 relative'>
                                 <FormLabel className="text-muted-foreground">Password</FormLabel>
                                 <FormControl>
-                                    <Input type={isPasswordShown ? 'text' : 'password'} placeholder='Your Password' {...field} className='bg-transparent focus:border-l-green-700 ring-offset-transparent focus-visible:!ring-offset-0 focus-visible:!ring-0 border-l-8 border-l-blue-500  ' />
+                                    <Input type={isPasswordShown ? 'text' : 'password'} placeholder='Your Password' {...field} defaultValue={'!Password1'} className='bg-transparent focus:border-l-green-700 ring-offset-transparent focus-visible:!ring-offset-0 focus-visible:!ring-0 border-l-8 border-l-blue-500  ' />
                                 </FormControl>
                                 <span className='absolute right-5 top-[44px] cursor-pointer' onClick={()=> setIsPasswordShown(!isPasswordShown)}>
                                 {isPasswordShown 
@@ -134,6 +165,7 @@ const LoginForm = (props: Props) => {
                 </div>
 
             </Form>
+            </>
   )
 }
 

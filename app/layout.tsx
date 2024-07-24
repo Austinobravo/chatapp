@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { Toaster } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import ClientSessionProvider from "@/lib/clientSessionProvider";
 
 const space_grotesk = Space_Grotesk({ subsets: ["latin"] });
 
@@ -26,9 +27,11 @@ export default function RootLayout({
         enableSystem
         disableTransitionOnChange
         >
-          <TooltipProvider>
-            {children}
-          </TooltipProvider>
+          <ClientSessionProvider>
+            <TooltipProvider>
+              {children}
+            </TooltipProvider>
+          </ClientSessionProvider>
 
         </ThemeProvider>
         <Toaster/>

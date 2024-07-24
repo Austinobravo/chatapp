@@ -1,3 +1,4 @@
+'use client'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -5,6 +6,10 @@ import { Check, X } from 'lucide-react'
 import React from 'react'
 
 const FriendCard = () => {
+  
+  React.useEffect(() => {
+    
+  },[])
   return (
     <Card className='flex justify-between gap-2 items-center bg-primary/5 p-2 my-2'>
         <div className='flex items-center gap-1'>
