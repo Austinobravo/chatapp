@@ -27,23 +27,29 @@ export async function POST(request: Request, response: NextApiResponse){
         }
     })
     if(existingRequestSender){
-        return NextResponse.json('Already friends', {status: 403})
+        return NextResponse.json('Friends request already sent', {status: 403})
     }
 
-    const existingRequestReceiver = await prisma.user.findUnique({
-        where: {
-            email: data.email,
-            requestsReceived:{
-                some:{
-                    sender: accessingUser?.id
-                }
-            }
-        },
+    // const existingRequestReceiver = await prisma.user.findUnique({
+    //     where: {
+    //         email: data.email,
+    //         requestsReceived:{
+    //             some:{
+    //                 sender: accessingUser?.id
+    //             }
+    //         }
+    //     },
 
+    // })
+    const existingRequestReceiver = await prisma.requests.findFirst({
+        where: {
+            sender: existingUser.id,
+            receiver: accessingUser?.id
+        }
     })
 
     if(existingRequestReceiver){
-        return NextResponse.json('Already friends', {status: 403})
+        return NextResponse.json('Friends request already sent', {status: 403})
     }
     
     const alreadyFriendsWithSender = await prisma.friends.findUnique({
@@ -56,15 +62,11 @@ export async function POST(request: Request, response: NextApiResponse){
     if(alreadyFriendsWithSender){
         return NextResponse.json('Already friends', {status: 403})
     }
-    const alreadyFriendsWithReciever = await prisma.user.findUnique({
+    const alreadyFriendsWithReciever = await prisma.friends.findUnique({
         where: {
-            email: data.email,
-            friends:{
-                some:{
-                    sender: accessingUser?.id
-                }
-            }
-        },
+            sender: existingUser.id,
+            receiver: accessingUser?.id
+        }
 
     })
 
@@ -73,7 +75,7 @@ export async function POST(request: Request, response: NextApiResponse){
     }
 
     try{
-        await prisma.requests.create({
+        await prisma.requests.create({ 
             data:{
                 sender: accessingUser?.id as string,
                 receiver: existingUser.id,

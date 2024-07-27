@@ -21,6 +21,7 @@ import { Eye, EyeOff, Facebook, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { z } from 'zod'
 import { useRouter } from 'next/navigation'
+import { useUserStore } from '@/hooks/store/useUserStore'
 
 const RegisterForm = () => {
     const [isPasswordShown, setIsPasswordShown] = React.useState<boolean>(false)
@@ -68,6 +69,8 @@ const RegisterForm = () => {
             console.error("error", error)
         }
     }
+    const {user} = useUserStore()
+    console.log('UserRegistrartion', user)
   return (
     <Form {...form}>
     <form onSubmit={form.handleSubmit(onSubmit)} className='pl-4'>

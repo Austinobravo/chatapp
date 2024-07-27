@@ -13,11 +13,16 @@ type UserType = {
 }
 type ConversationType = {
     id: string
+    name: string
+  
+    requestId: string
+    request: RequestType
+    friends: Array[]
+    lastMessage: string
     isGroup: boolean
-
-
-    userId: string
-    createdAt: string
+    message: Array[]
+    conversationMembers: Array[]
+  
 }
 
 type RequestType = {

@@ -22,6 +22,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
 import {signIn, useSession} from 'next-auth/react'
 import InitUser from '@/hooks/store/initUser'
+import { useUserStore } from '@/hooks/store/useUserStore'
 
 type Props = {}
 
@@ -87,6 +88,15 @@ const LoginForm = (props: Props) => {
                 setUserDetails(data)
             })
         }
+
+        const {addUser} = useUserStore()
+
+        React.useEffect(()=> {
+            if(!session){
+                return
+            }
+            addUser(session.user as UserType)
+        }, [session])
         
         
         

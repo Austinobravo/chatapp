@@ -1,13 +1,14 @@
 import { getCurrentUser } from '../../../../lib/serverSessionProvider';
 import { NextRequest, NextResponse } from "next/server";
 import prisma from '@/lib/prisma'
+import { Session } from 'next-auth';
 export async function GET(request:NextRequest, {params}: {params:{Id: string}}) {
     const userId = params.Id
     const accessingUser = await getCurrentUser()
 
-    // if(userId !== accessingUser?.id){
-    //     return NextResponse.json("Forbidden",{status: 403})
-    // }
+    if(userId !== accessingUser?.id){
+        return NextResponse.json("Forbidden",{status: 403})
+    }
 
     try{
         const foundRequest = await prisma.requests.findMany({
@@ -63,7 +64,7 @@ export async function PATCH(request:NextRequest, {params}: {params:{Id: string}}
     const userFoundRequest = await prisma.requests.findUnique({
         where: {
             id: requestId,
-            AND: [
+            OR: [
                 {
                     sender: accessingUser?.id
                 },
@@ -89,15 +90,16 @@ export async function PATCH(request:NextRequest, {params}: {params:{Id: string}}
                     isaccepted: true
                 }
             })
-    
+            
             const newConversation = await newPrisma.conversations.create({
-               data: {
-                isGroup: false,
-                requestId: requestId
-               }
+                data: {
+                    isGroup: false,
+                    requestId: requestId
+                }
                 
             })
-    
+
+            
             await newPrisma.friends.create({
                 data:{
                     conversationId: newConversation.id,
@@ -106,15 +108,18 @@ export async function PATCH(request:NextRequest, {params}: {params:{Id: string}}
                     isaccepted: true
                 }
             }) 
+
             await newPrisma.conversationsMembers.create({
                 data:{
                     conversationId: newConversation.id,
                     userId: updatedRequests.receiver
                 }
             })
-
+            console.log('all created',)
+            
             return updatedRequests
         })
+        console.log('all created',updatedRequest)
         
         return NextResponse.json(updatedRequest, {status: 200})
     }

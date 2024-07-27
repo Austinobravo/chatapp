@@ -41,12 +41,20 @@ const FriendCard = () => {
   },[user, userId])
 
   const handleAccept = async (requestId: string) => {
+    console.log('id', requestId)
     await fetch(`/api/friendrequests/${requestId}`, 
       {
         method: 'PATCH'
       }
     )
-    .then((response) => response.json())
+    .then((response) => {
+      if(!response.ok){
+        toast.error(response.statusText)
+        return
+      }
+       return response.json()
+      }
+    )
     .then((updatedRequests) => {
       setRequests((prevRequests) => prevRequests?.map(request => request.id === requestId
         ?
@@ -104,7 +112,7 @@ const FriendCard = () => {
                 <p className='text-xs text-wrap break-all line-clamp-1  text-black dark:text-white/90 opacity-40'>{request.user.email}</p>
                 </div>
             </div>
-            {request.sender === userId ?
+            {request.sender === userId && !request.isaccepted ?
             <div>
               <p className='text-xs font-bold shadow-0'>Pending...</p>
             </div>

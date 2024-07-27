@@ -7,24 +7,6 @@ const ConversationList = () => {
     <ItemsList title='Conversations'>
             <p className='text-center text-primary '>Conversations</p>
             <ConversationCard/>
-            <ConversationCard/>
-            <ConversationCard/>
-            <ConversationCard/>
-            <ConversationCard/>
-            <ConversationCard/>
-            <ConversationCard/>
-            <ConversationCard/>
-            <ConversationCard/>
-            <ConversationCard/>
-            <ConversationCard/>
-            <ConversationCard/>
-            <ConversationCard/>
-            <ConversationCard/>
-            <ConversationCard/>
-            <ConversationCard/>
-            <ConversationCard/>
-            <ConversationCard/>
-            <ConversationCard/>
     </ItemsList>
   )
 }

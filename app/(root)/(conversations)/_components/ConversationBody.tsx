@@ -135,6 +135,8 @@ const data = [
     },
 ]
 const ConversationBody = () => {
+    // const conversations = useConversationStore((state) => state.message)
+    // const user = await getCurrentUser()
     const formatTime = (timestamp: number) => {
         return format(timestamp, 'HH:mm')
     }
