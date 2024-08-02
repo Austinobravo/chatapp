@@ -71,6 +71,7 @@ model Conversations{
   request Requests @relation(fields: [requestId], references: [id], onDelete: Cascade)
   friends Friends[]
   lastMessage String?
+  createdBy String?
   isGroup Boolean @default(false)
   message Message[]
   conversationMembers ConversationsMembers[]
@@ -84,8 +85,6 @@ model ConversationsMembers{
 
   userId String
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  lastMessage String?
-  
   conversationId String
   conversation Conversations @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
