@@ -25,10 +25,9 @@ export async function POST(request: Request, response: NextApiResponse){
     if(!userInConversation){
         return NextResponse.json('Forbidden', {status: 403})
     }
-   
     try{
         const newMessage = await prisma.$transaction(async (newPrisma) => {
-            await newPrisma.message.create({
+            const message = await newPrisma.message.create({
                 data: {
                     message: data.message,
                     userId: data.userId,
@@ -44,9 +43,11 @@ export async function POST(request: Request, response: NextApiResponse){
                     lastMessage: data.message
                 }
             })
+
+            return message
+
         })
 
-      
         return NextResponse.json(newMessage, {status: 201})
 
     }
