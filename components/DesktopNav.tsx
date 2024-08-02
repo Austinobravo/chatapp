@@ -8,9 +8,46 @@ import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip'
 import Link from 'next/link'
 import { Button } from './ui/button'
 import { ModeToggle } from './mode-toggle'
+import { useUserStore } from '@/hooks/store/useUserStore'
+import { useSession } from 'next-auth/react'
+import { toast } from 'sonner'
 
 const DesktopNav = () => {
     const paths = useNavigation()
+    const {user, setUser} = useUserStore()
+    const {data:session} = useSession()
+    const userId = session?.user.id
+    
+    
+    React.useEffect(()=> {
+        console.log('sidebarCard', session)
+        // if(session){
+        //     setUser(session.user as any)
+        // }
+        const fetchData = async () => {
+            await fetch(`/api/users/${userId}`, {
+                        method: 'GET'
+                    })
+                    .then((response) => {
+                    if(!response.ok){
+                        toast.error(response.statusText)
+                        return
+                    }
+                    return response.json()
+                        
+                })
+                .then((data: UserType) => {
+                    setUser(data)
+                        console.log('userinsidebardata',data)
+                        console.log('userinsidebar',user)
+                    })
+                }
+                if(userId){
+                    fetchData()
+                }
+
+            }, [setUser,session])
+            
   return (
     <div>
         <Card className=' w-16 flex flex-col justify-between h-full bg-gray-300 dark:bg-black border-0 py-3 mt-10 fixed top-5 pb-20'>

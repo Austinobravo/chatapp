@@ -7,8 +7,6 @@ import { useUserStore } from '@/hooks/store/useUserStore'
 
 
 const page = () => {
-  const {user} = useUserStore()
-    console.log('UserRe', user)
   
   return (
     <div className='h-full w-full flex'>

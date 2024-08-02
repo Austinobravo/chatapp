@@ -2,13 +2,19 @@ import { getCurrentUser } from '../../../../lib/serverSessionProvider';
 import { NextRequest, NextResponse } from "next/server";
 import prisma from '@/lib/prisma'
 import { Session } from 'next-auth';
-export async function GET(request:NextRequest, {params}: {params:{Id: string}}) {
+export async function GET(request:NextRequest,{params}: {params:{Id: string}}) {
+    console.log("no userId", params.Id)
+    if(!params.Id){
+        return NextResponse.json("Forbidden",{status: 403})
+    }
     const userId = params.Id
     const accessingUser = await getCurrentUser()
+
 
     if(userId !== accessingUser?.id){
         return NextResponse.json("Forbidden",{status: 403})
     }
+    console.log("userId", userId)
 
     try{
         const foundRequest = await prisma.requests.findMany({
@@ -28,10 +34,14 @@ export async function GET(request:NextRequest, {params}: {params:{Id: string}}) 
                 userReceiver: true
             }    
         })
+        if(!foundRequest){
+            return NextResponse.json("Not Found",{status: 404})
+        }
         const updatedRequest = foundRequest.map((request) => {
             const userDetails = request.sender === userId ? request.userReceiver : request.userSender
             return {...request, user:userDetails}
         })
+        console.log("updated", updatedRequest)
 
         return NextResponse.json(updatedRequest, {status: 200})
     }
@@ -42,14 +52,14 @@ export async function GET(request:NextRequest, {params}: {params:{Id: string}}) 
     
 }
 
-export async function PATCH(request:NextRequest, {params}: {params:{Id: string}}) {
+export async function PATCH(request:NextRequest,{params}: {params:{Id: string}}) {
     const requestId = params.Id
     const accessingUser = await getCurrentUser()
 
-    // if(userId !== accessingUser?.id){
-    //     return NextResponse.json("Forbidden",{status: 403})
-    // }
-    const foundRequest = await prisma.requests.findMany({
+    if(!accessingUser){
+        return NextResponse.json("Forbidden",{status: 403})
+    }
+    const foundRequest = await prisma.requests.findFirst({
         where: {
             id: requestId
             
@@ -94,12 +104,12 @@ export async function PATCH(request:NextRequest, {params}: {params:{Id: string}}
             const newConversation = await newPrisma.conversations.create({
                 data: {
                     isGroup: false,
-                    requestId: requestId
+                    requestId: requestId,
+                    userId: accessingUser?.id!
                 }
                 
             })
 
-            
             await newPrisma.friends.create({
                 data:{
                     conversationId: newConversation.id,
@@ -115,6 +125,13 @@ export async function PATCH(request:NextRequest, {params}: {params:{Id: string}}
                     userId: updatedRequests.receiver
                 }
             })
+            await newPrisma.conversationsMembers.create({
+                data:{
+                    conversationId: newConversation.id,
+                    userId: updatedRequests.sender
+                }
+            })
+
             console.log('all created',)
             
             return updatedRequests

@@ -30,17 +30,6 @@ export async function POST(request: Request, response: NextApiResponse){
         return NextResponse.json('Friends request already sent', {status: 403})
     }
 
-    // const existingRequestReceiver = await prisma.user.findUnique({
-    //     where: {
-    //         email: data.email,
-    //         requestsReceived:{
-    //             some:{
-    //                 sender: accessingUser?.id
-    //             }
-    //         }
-    //     },
-
-    // })
     const existingRequestReceiver = await prisma.requests.findFirst({
         where: {
             sender: existingUser.id,

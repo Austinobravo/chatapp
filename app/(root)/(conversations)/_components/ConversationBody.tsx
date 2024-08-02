@@ -1,6 +1,9 @@
+"use client"
 import { Card } from '@/components/ui/card'
 import React from 'react'
 import { format } from "date-fns";
+import { useUserStore } from '@/hooks/store/useUserStore';
+import { useSession } from 'next-auth/react';
 
 const data = [
     {
@@ -134,12 +137,19 @@ const data = [
         userId: 1
     },
 ]
-const ConversationBody = () => {
+
+
+const ConversationBody = ({conversation}: {conversation:ConversationType}) => {
     // const conversations = useConversationStore((state) => state.message)
     // const user = await getCurrentUser()
+    const {user} = useUserStore()
+    const {data:session} = useSession()
+    const userId = session?.user.id
     const formatTime = (timestamp: number) => {
         return format(timestamp, 'HH:mm')
     }
+
+   
   return (
     <Card className='no-scrollbar overflow-y-scroll flex flex-col-reverse flex-1  gap-2 p-3 ml-16 w-[calc(100%_-_4rem)] lg:!ml-[24rem] lg:w-[calc(100%_-_24rem)] bg-transparent dark:bg-black mt-20 mb-10'>
         <div className='space-y-1 '>

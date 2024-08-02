@@ -62,7 +62,7 @@ const LoginForm = (props: Props) => {
                 toast.success('Login Successful')
                 console.log('res', session)
                 if(session){
-                    await getUser(session.user)
+                    // await getUser(session.user)
                     return router.push('/conversations') 
                 }
             }
@@ -73,30 +73,7 @@ const LoginForm = (props: Props) => {
     }
     
     
-    const getUser:any = async (userSession: any) =>  {
-        await fetch(`/api/users/${userSession?.id}`, {
-            method: 'GET'
-        })
-        .then((response) => {
-            if(!response.ok){
-                throw new Error('Data not found')
-                }
-                return response.json()
-                
-            })
-            .then((data: UserType) => {
-                setUserDetails(data)
-            })
-        }
 
-        const {addUser} = useUserStore()
-
-        React.useEffect(()=> {
-            if(!session){
-                return
-            }
-            addUser(session.user as UserType)
-        }, [session])
         
         
         

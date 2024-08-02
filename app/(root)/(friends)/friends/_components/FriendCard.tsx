@@ -5,43 +5,43 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { useUserStore } from '@/hooks/store/useUserStore'
 
-import { Check, X } from 'lucide-react'
+import { Check, Loader2, X } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import React from 'react'
 import { toast } from 'sonner'
 
 const FriendCard = () => {
-  const [requests, setRequests] = React.useState([] as RequestType[]|null)
+  const [requests, setRequests] = React.useState<RequestType[] | undefined>(undefined)
   const [open, setOpen] = React.useState<boolean>(false)
-  const { user } = useUserStore()
+  const {user} = useUserStore()
   const {data:session} = useSession()
-  const userId = session?.user.id
-  
+  const Id = session?.user.id
+
   React.useEffect(() => {
     const fetchData = async () => {
-      await fetch(`/api/friendrequests/${userId}`, {
+      await fetch(`/api/friendrequests/${Id}`, {
         method: 'GET'
     })
     .then((response) => {
         if(!response.ok){
-            // toast.error(response.statusText)
+            toast.error(response.statusText)
             return
             }
             return response.json()
             
         })
         .then((data: RequestType[]) => {
-            console.log('data', data)
-            console.log('datauser', session?.user)
+          console.log('data', data)
             setRequests(data)
         })
     
     }
-    fetchData()
-  },[user, userId])
+    if(Id){
+      fetchData()
+    }
+  },[user, Id])
 
   const handleAccept = async (requestId: string) => {
-    console.log('id', requestId)
     await fetch(`/api/friendrequests/${requestId}`, 
       {
         method: 'PATCH'
@@ -56,14 +56,15 @@ const FriendCard = () => {
       }
     )
     .then((updatedRequests) => {
-      setRequests((prevRequests) => prevRequests?.map(request => request.id === requestId
-        ?
-        {
-          ...request, isaccepted: true
-        }
-        :
-        request
-      ) || null)
+      // setRequests((prevRequests) => prevRequests?.map(request => request.id === requestId
+      //   ?
+      //   {
+      //     ...request, isaccepted: true
+      //   }
+      //   :
+      //   request
+      // ) || null)
+      setRequests(updatedRequests)
 
       toast.success('Friend request accepted')
     })
@@ -81,7 +82,8 @@ const FriendCard = () => {
     )
     .then((response) => response.json())
     .then((updatedRequests) => {
-      setRequests((prevRequests) => prevRequests?.filter(request => request.id !== requestId) || null)
+      // setRequests((prevRequests) => prevRequests?.filter(request => request.id !== requestId) || null)
+      setRequests(updatedRequests)
       setOpen(!open)
       toast.success('Friend request rejected')
     })
@@ -93,11 +95,8 @@ const FriendCard = () => {
   
   return (
     <>
-    {requests === null ? 
-    <p>No friends</p>
-      :
-      requests === undefined ?
-    <p>loading...</p>
+    { requests === undefined ?
+    <div className='flex justify-center items-center'><Loader2 className="animate-spin"/></div>
     :
     requests.length > 0 ?
       requests.map((request, index) => (
@@ -112,7 +111,7 @@ const FriendCard = () => {
                 <p className='text-xs text-wrap break-all line-clamp-1  text-black dark:text-white/90 opacity-40'>{request.user.email}</p>
                 </div>
             </div>
-            {request.sender === userId && !request.isaccepted ?
+            {request.sender === Id && !request.isaccepted ?
             <div>
               <p className='text-xs font-bold shadow-0'>Pending...</p>
             </div>

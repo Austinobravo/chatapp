@@ -25,6 +25,7 @@ model User{
   requestsSent Requests[] @relation("SenderRelation")
   friends Friends[]
   messages Message[]
+  conversations Conversations[]
   
 
   conversationsMembers ConversationsMembers[]
@@ -64,6 +65,8 @@ model Conversations{
   id String @id @default(uuid())
   name String?
 
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   requestId String
   request Requests @relation(fields: [requestId], references: [id], onDelete: Cascade)
   friends Friends[]

@@ -9,6 +9,7 @@ type UserType = {
     friends: Array[]
     requests: Array[]
     conversations: Array[]
+    requests: RequestType[]
     createdAt: string
 }
 type ConversationType = {
