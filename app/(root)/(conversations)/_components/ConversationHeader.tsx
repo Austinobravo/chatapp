@@ -13,10 +13,10 @@ const ConversationHeader = ({conversation}: {conversation:any}) => {
                 <Link href="/conversations" className='lg:hidden'><CircleArrowLeft className=''/></Link>
                 <Avatar>
                 <AvatarImage/>
-                <AvatarFallback className='bg-primary text-white'>{conversation?.existingConversation.isGroup ? conversation?.existingConversation.name.substring(0,2) : conversation?.otherMember.username.substring(0,2)}</AvatarFallback>
+                <AvatarFallback className='bg-primary text-white'>{conversation?.existingConversation?.isGroup ? conversation?.existingConversation?.name.substring(0,2) : conversation?.otherMemberDetails?.username?.substring(0,2)}</AvatarFallback>
                 </Avatar>
                 <div className='text-black dark:text-white'>
-                    <h3 className='truncate text-sm font-bold shadow-none'>{conversation?.existingConversation.isGroup ? conversation?.existingConversation.name: conversation?.otherMember.username}</h3>
+                    <h3 className='truncate text-sm font-bold shadow-none'>{conversation?.existingConversation?.isGroup ? conversation?.existingConversation?.name: conversation?.otherMemberDetails?.username}</h3>
                 </div>
             </div>
             <div>

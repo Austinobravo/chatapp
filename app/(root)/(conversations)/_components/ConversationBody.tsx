@@ -139,7 +139,7 @@ const data = [
 ]
 
 
-const ConversationBody = ({conversation}: {conversation:ConversationType}) => {
+const ConversationBody = ({messages}: {messages:any}) => {
     // const conversations = useConversationStore((state) => state.message)
     // const user = await getCurrentUser()
     const {user} = useUserStore()
@@ -148,15 +148,16 @@ const ConversationBody = ({conversation}: {conversation:ConversationType}) => {
     const formatTime = (timestamp: number) => {
         return format(timestamp, 'HH:mm')
     }
-
+    console.log('converssa', messages)
    
   return (
-    <Card className='no-scrollbar overflow-y-scroll flex flex-col-reverse flex-1  gap-2 p-3 ml-16 w-[calc(100%_-_4rem)] lg:!ml-[24rem] lg:w-[calc(100%_-_24rem)] bg-transparent dark:bg-black mt-20 mb-10'>
+
+    <Card className='no-scrollbar overflow-y-scroll flex flex-col-reverse flex-1  gap-2 p-3 ml-16 w-[calc(100%_-_4rem)] lg:!ml-[24rem] lg:w-[calc(100%_-_24rem)] bg-transparent dark:bg-black mt-20 mb-24 shadow-none border-0'>
         <div className='space-y-1 '>
-            {data.map((conversation, index) => (
-                <div key={index} className={`${conversation.userId === 1 ? ' ml-auto  bg-primary' : 'order-2 items-start bg-emerald-500'} ${data.length -1 === index && conversation.userId === 1 && 'rounded-br-none'} ${ data.length -1 === index && conversation.userId !== 1 && 'rounded-bl-none'} rounded-lg w-fit text-white p-2 break-all`}>
-                    <span>{conversation.message}</span>
-                    <p className={`${conversation.userId === 1 ? 'ml-auto': 'mr-auto'} text-primary-foreground text-xs  w-fit`}>{formatTime(new Date().getTime())}</p>
+            {messages?.existingConversation?.message.map((conversation: any, index:number) => (
+                <div key={index} className={`${conversation.userId === userId ? ' ml-auto bg-primary order-1 items-end' : 'order-2 items-start bg-emerald-500'} ${messages?.existingConversation?.message.length -1 === index ? messages?.existingConversation?.message[length].userId !== userId && 'rounded-br-none':'rounded-bl-none '} ${conversation.message.length > 30 ? 'w-80' : 'w-fit'} rounded-lg  text-white p-2 break-all`}>
+                    <span>{conversation.message} </span>
+                    <p className={`${conversation.userId === userId ? 'ml-auto': 'mr-auto'} text-primary-foreground text-xs  w-fit`}>{formatTime(conversation.createdAt)}</p>
                 </div>
             ))}
         </div>

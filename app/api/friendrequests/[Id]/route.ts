@@ -37,9 +37,14 @@ export async function GET(request:NextRequest,{params}: {params:{Id: string}}) {
         if(!foundRequest){
             return NextResponse.json("Not Found",{status: 404})
         }
+        const conversation = await prisma.conversations.findFirst({
+            where:{
+                requestId: foundRequest[0].id
+            }
+        })
         const updatedRequest = foundRequest.map((request) => {
             const userDetails = request.sender === userId ? request.userReceiver : request.userSender
-            return {...request, user:userDetails}
+            return {...request, user:userDetails, conversation: conversation}
         })
         console.log("updated", updatedRequest)
 

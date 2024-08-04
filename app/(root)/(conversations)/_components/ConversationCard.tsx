@@ -41,7 +41,23 @@ const ConversationCard = async () => {
   return (
     <>
     {conversations === undefined ?
-    <p>Skeleton</p>
+    <div className='flex justify-center items-center w-full'>
+        <Card className='flex justify-between gap-2 items-center bg-primary/5 p-2 my-2 w-full'>
+              <div className='flex items-center gap-1 animate-pulse'>
+                  <Avatar>
+                  <AvatarImage/>
+                  <AvatarFallback className='bg-primary text-white'></AvatarFallback>
+                  </Avatar>
+                  <div className='text-black dark:text-white'>
+                  <h3 className='truncate text-sm animate-pulse'></h3>
+                  <p className='text-xs text-wrap break-all line-clamp-1  text-black dark:text-white/90 opacity-40 animate-pulse'></p>
+                  </div>
+              </div>
+              <div>
+                <p className='text-xs font-bold shadow-0 animate-pulse '></p>
+              </div>
+          </Card>
+    </div>
       :
       conversations.length > 0 ?
         conversations.map((conversation, index) => (
@@ -53,7 +69,7 @@ const ConversationCard = async () => {
                   </Avatar>
                   <div className='text-black dark:text-white'>
                   <h3 className='truncate text-sm'>{conversation.conversation.isGroup ? conversation.name : conversation.otherMember.username}</h3>
-                  <p className='text-xs text-wrap break-all line-clamp-1 text-black dark:text-white/90 opacity-40'>Start a conversation</p>
+                  <p className='text-xs text-wrap break-all line-clamp-1 text-black dark:text-white/90 opacity-40'>{conversation.conversation.lastMessage ? conversation.conversation.lastMessage : "Start a conversation"}</p>
                   </div>
               </Link>
 

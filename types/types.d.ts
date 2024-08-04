@@ -33,5 +33,6 @@ type RequestType = {
     sender: string
     receiver: string
     user: UserType
+    conversation: ConversationType
 
 }

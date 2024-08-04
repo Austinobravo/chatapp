@@ -13,22 +13,15 @@ export async function GET(request:NextRequest, {params}: {params:{conversationId
     const existingConversation = await prisma.conversations.findUnique({
         where:{
             id:conversationId
+        },
+        include:{
+            message: true
         }
     })
+   
     if(!existingConversation){
         return NextResponse.json("Not Found", {status: 404})
     }
-
-    // const userInConversationMembers = await prisma.conversationsMembers.findUnique({
-    //     where:{
-    //         id: conversationId,
-    //         userId: accessingUser?.id
-    //     },
-
-    // })
-    // if(!userInConversationMembers){
-    //     return NextResponse.json('Forbidden', {status: 403})
-    // }
 
     try{
 
@@ -42,26 +35,40 @@ export async function GET(request:NextRequest, {params}: {params:{conversationId
         if(!userInConversation){
             return NextResponse.json("Forbidden", {status: 403})
         }
+        let response;
 
-        const allConversationMembersDetails = await Promise.all(conversationMembers?.map(async (members) => {
+        if(existingConversation.isGroup){
             const conversationMember = await prisma.user.findMany({
                 where: {
-                    id: members.userId
+                    id:{
+                        in: conversationMembers.map((member) => member.id)
+                    } 
                 }
             });
             if (!conversationMember) {
                 return null;
             }
-            if(existingConversation?.isGroup){
-                return {conversationMember,existingConversation}
-            }else{
-                const otherMember = conversationMember.find((member)=> member?.id !== accessingUser?.id)
-                return {existingConversation, otherMember}
+            response = {conversationMember,existingConversation}
+        }else{
+            const otherMember = conversationMembers.find((member)=> member?.id !== accessingUser?.id)
+
+            if(!otherMember){
+                return NextResponse.json("Not Found", {status: 404})
             }
-        }))
-        const filteredConversationsMembersDetails = allConversationMembersDetails.filter(convo => convo !== null);
-        console.log("filtered", filteredConversationsMembersDetails)
-        return NextResponse.json(filteredConversationsMembersDetails, {status: 200})
+
+            const otherMemberDetails = await prisma.user.findUnique({
+                where:{
+                    id: otherMember.userId
+                }
+            })
+
+            if(!otherMemberDetails){
+                return NextResponse.json("Not Found", {status: 404})
+            }
+            response =  {existingConversation, otherMemberDetails}
+        }
+        console.log("filtered", response)
+        return NextResponse.json(response, {status: 200})
 
     }
     catch(error){
