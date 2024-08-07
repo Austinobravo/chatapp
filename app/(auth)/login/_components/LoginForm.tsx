@@ -2,7 +2,7 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { zodResolver } from '@hookform/resolvers/zod'
-import React, { useMemo } from 'react'
+import React from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import {
@@ -20,9 +20,7 @@ import { Eye, EyeOff, Facebook, Loader2 } from 'lucide-react'
 import { passwordSchema } from '@/lib/validation'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
-import {signIn, useSession} from 'next-auth/react'
-import InitUser from '@/hooks/store/initUser'
-import { useUserStore } from '@/hooks/store/useUserStore'
+import {signIn} from 'next-auth/react'
 
 type Props = {}
 
@@ -31,7 +29,6 @@ const LoginForm = (props: Props) => {
     const [userDetails, setUserDetails] = React.useState({} as UserType)
     const callbackUrl = useSearchParams().get('callbackUrl') || '/conversations'
     const router = useRouter()
-    const {data: session} = useSession()
     const formSchema = z.object({
         email: z.string().min(1, {message: "This field is mandatory"}).email('Please enter a valid email.'),
         password: passwordSchema
@@ -60,11 +57,8 @@ const LoginForm = (props: Props) => {
             if(response?.error) return toast.error(response.error)
             if(response?.ok){
                 toast.success('Login Successful')
-                console.log('res', session)
-                if(session){
-                    // await getUser(session.user)
-                    return router.push('/conversations') 
-                }
+                return router.push('/conversations') 
+                
             }
             
         }catch(error){
@@ -79,9 +73,6 @@ const LoginForm = (props: Props) => {
         
         return (
             <>
-            {Object.entries(userDetails).length > 0 &&
-                <InitUser user={userDetails}/>
-            }
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className='pl-4'>
                     <FormField

@@ -5,7 +5,7 @@ import { CircleArrowLeft, Settings } from 'lucide-react'
 import Link from 'next/link'
 import React from 'react'
 
-const ConversationHeader = ({conversation}: {conversation:any}) => {
+const ConversationHeader = ({conversation}: {conversation:UpdatedConversationType}) => {
   return (
     <>
         <Card className='flex justify-between gap-2 items-center ml-16 lg:!ml-[24rem] lg:w-[calc(100%_-_26rem)] bg-gray-200 dark:bg-black p-2 px-3 fixed top-0 w-[calc(100%_-_6rem)] mt-16'>

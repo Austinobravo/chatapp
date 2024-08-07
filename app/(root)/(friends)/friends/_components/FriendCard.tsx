@@ -5,18 +5,17 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { useUserStore } from '@/hooks/store/useUserStore'
 
-import { Check, Loader2, X } from 'lucide-react'
+import { Check, X } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import React from 'react'
 import { toast } from 'sonner'
 
 const FriendCard = () => {
-  const [requests, setRequests] = React.useState<RequestType[] | undefined>(undefined)
+  // const [requests, setRequests] = React.useState<RequestType[] | undefined>(undefined)
   const [open, setOpen] = React.useState<boolean>(false)
-  const {user} = useUserStore()
-  const {data:session} = useSession()
-  const Id = session?.user.id
+  const {user, requests, setRequests} = useUserStore()
+  const Id = user?.id
 
   React.useEffect(() => {
     const fetchData = async () => {
@@ -32,7 +31,7 @@ const FriendCard = () => {
             
         })
         .then((data: RequestType[]) => {
-          console.log('frienddata', data)
+          console.log('setRequests', data)
             setRequests(data)
         })
     
@@ -65,6 +64,7 @@ const FriendCard = () => {
       //   :
       //   request
       // ) || null)
+      console.log("setRequests", updatedRequests)
       setRequests(updatedRequests)
 
       toast.success('Friend request accepted')
@@ -97,28 +97,30 @@ const FriendCard = () => {
   return (
     <>
     { requests === undefined ?
-    <div className='flex justify-center items-center w-full'>
-      <Card className='flex justify-between gap-2 items-center bg-primary/5 p-2 my-2 w-full'>
-            <div className='flex items-center gap-1 animate-pulse'>
-                <Avatar>
-                <AvatarImage/>
-                <AvatarFallback className='bg-primary text-white'></AvatarFallback>
-                </Avatar>
-                <div className='text-black dark:text-white'>
-                <h3 className='truncate text-sm animate-pulse'></h3>
-                <p className='text-xs text-wrap break-all line-clamp-1  text-black dark:text-white/90 opacity-40 animate-pulse'></p>
-                </div>
-            </div>
-            <div>
-              <p className='text-xs font-bold shadow-0 animate-pulse '></p>
-            </div>
-        </Card>
-    </div>
+    [1,2,3,4].map((_, index) => (
+      <div key={index} className='flex justify-center items-center w-full'>
+        <Card className='flex justify-between gap-2 items-center bg-primary/5 p-2 my-2 w-full'>
+              <div className='flex items-center gap-1 animate-pulse'>
+                  <Avatar>
+                  <AvatarImage/>
+                  <AvatarFallback className='bg-primary text-white'></AvatarFallback>
+                  </Avatar>
+                  <div className='text-black dark:text-white'>
+                  <h3 className='truncate text-sm animate-pulse'></h3>
+                  <p className='text-xs text-wrap break-all line-clamp-1  text-black dark:text-white/90 opacity-40 animate-pulse'></p>
+                  </div>
+              </div>
+              <div>
+                <p className='text-xs font-bold shadow-0 animate-pulse '></p>
+              </div>
+          </Card>
+      </div>
+    ))
     :
     requests.length > 0 ?
       requests.map((request, index) => (
         <Card key={index} className='flex justify-between gap-2 items-center bg-primary/5 p-2 my-2'>
-            <Link href={`/conversations/${request.conversation.id}`} className='flex items-center gap-1'>
+            <Link href={`/conversations/${request.conversation.id}`} className='flex items-center gap-1 w-full'>
                 <Avatar>
                 <AvatarImage/>
                 <AvatarFallback className='bg-primary text-white'>{request.user.username.substring(0,2)}</AvatarFallback>

@@ -57,7 +57,7 @@ const RegisterForm = () => {
                 .then((message) => {
                     toast.success(message)
                     form.reset()
-                    router.push('/conversations')
+                    router.push('/login')
                 })
 
             }else{
@@ -69,8 +69,6 @@ const RegisterForm = () => {
             console.error("error", error)
         }
     }
-    const {user} = useUserStore()
-    console.log('UserRegistrartion', user)
   return (
     <Form {...form}>
     <form onSubmit={form.handleSubmit(onSubmit)} className='pl-4'>
@@ -175,7 +173,7 @@ const RegisterForm = () => {
         </Link>
     </div>
 
-</Form>
+    </Form>
   )
 }
 

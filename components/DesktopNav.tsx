@@ -20,10 +20,6 @@ const DesktopNav = () => {
     
     
     React.useEffect(()=> {
-        console.log('sidebarCard', session)
-        // if(session){
-        //     setUser(session.user as any)
-        // }
         const fetchData = async () => {
             await fetch(`/api/users/${userId}`, {
                         method: 'GET'
@@ -37,9 +33,8 @@ const DesktopNav = () => {
                         
                 })
                 .then((data: UserType) => {
+                    console.log("setUser", data)
                     setUser(data)
-                        console.log('userinsidebardata',data)
-                        console.log('userinsidebar',user)
                     })
                 }
                 if(userId){
@@ -50,7 +45,7 @@ const DesktopNav = () => {
             
   return (
     <div>
-        <Card className=' w-16 flex flex-col justify-between h-full bg-gray-300 dark:bg-black border-0 py-3 mt-10 fixed top-5 pb-20'>
+        <Card className='w-16 flex flex-col justify-between h-full bg-gray-300 dark:bg-black border-0 py-3 mt-10 fixed top-5 pb-20'>
             <nav>
                 <ul className='flex flex-col gap-4 items-center'>
                     {paths.map((path, index) => {

@@ -1,6 +1,7 @@
 import { getCurrentUser } from "@/lib/serverSessionProvider";
 import { NextResponse } from "next/server";
 import prisma from '@/lib/prisma'
+import { NextApiResponse } from "next";
 
 export async function GET(request:Request) {
     const user = await getCurrentUser()
@@ -55,21 +56,21 @@ export async function GET(request:Request) {
             if(!conversation){
                 return null
             }
-            if(conversation.isGroup){
-                return conversation
-            }else{
-                const otherConversationMembers = conversationMembers.find((members) => members.userId !== currentUser.id)
-                if (!otherConversationMembers) {
-                    return null;
-                }
-                const otherMember = await prisma.user.findUnique({
-                    where:{
-                        id: otherConversationMembers.userId
-                    }
-                })
-
-                return {conversation, otherMember}
+            const otherConversationMembers = conversationMembers.find((members) => members.userId !== currentUser.id)
+            if (!otherConversationMembers) {
+                return null;
             }
+            const otherMember = await prisma.user.findUnique({
+                where:{
+                    id: otherConversationMembers.userId
+                }
+            })
+
+            return {conversation, otherMember}
+            // if(conversation.isGroup){
+            //     return conversation
+            // }else{
+            // }
             
         }))
         // Filter out any null values
@@ -82,6 +83,70 @@ export async function GET(request:Request) {
         console.error("Error", error)
         return NextResponse.error()
 
+    }
+    
+}
+
+export async function POST(request: Request, response: NextApiResponse){
+    const data = await request.json()
+    const accessingUser = await getCurrentUser()
+
+    if(!accessingUser){
+        return NextResponse.json('Forbidden', {status: 403})
+    }
+
+    const {members, name, userId} = data
+
+    if(userId !== accessingUser?.id){
+        return NextResponse.json('Forbidden', {status: 403})
+    }
+    console.log("user", userId)
+    console.log("name", name)
+    console.log("members", members)
+
+    try{
+        const newGroupConversation = await prisma.$transaction(async(newPrisma) => {
+            console.log('newconvo')
+            const conversation = await newPrisma.conversations.create({
+                data: {
+                    name: name,
+                    createdBy: userId,
+                    isGroup: true,
+                }
+    
+            })
+            console.log('convo', conversation)
+            const otherMember = await Promise.all([...members, userId].map(async (member) => {
+                await newPrisma.conversationsMembers.create({
+                   data:{
+                       userId:member,
+                       conversationId: conversation.id
+                   }
+               })
+
+               const userDetails = await newPrisma.user.findUnique({
+                where: {
+                    id: member
+                }
+               })
+
+               return userDetails
+    
+            }))
+
+            console.log('other', otherMember)
+
+            return {conversation, otherMember}
+
+        })
+        console.log("newGroup", newGroupConversation)
+
+        return NextResponse.json(newGroupConversation, {status: 201})
+
+    }
+    catch(error){
+        console.log('err', error)
+        return NextResponse.json('An error occured', {status: 505})
     }
     
 }

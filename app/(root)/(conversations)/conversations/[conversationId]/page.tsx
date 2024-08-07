@@ -4,18 +4,13 @@ import ConversationHeader from '../../_components/ConversationHeader'
 import ConversationBody from '../../_components/ConversationBody'
 import ConversationInput from '../../_components/ConversationInput'
 import ConversationList from '../../_components/ConversationList'
-import { useConversationStore } from '@/hooks/store/useMessagesStore'
 import { toast } from 'sonner'
-import InitMessage from '@/hooks/store/initMessage'
 import { useUserStore } from '@/hooks/store/useUserStore'
 import { Loader2 } from 'lucide-react'
 
 const ConversationPage = ({params}: {params:{conversationId: string}}) => {
-  const {user} = useUserStore()
-    console.log('UserRe', user)
   const conversationId = params.conversationId
-  const [conversation, setConversation] = React.useState<ConversationType[] | undefined>(undefined)
- const {message} = useConversationStore()
+ const {messages, setMessages} = useUserStore()
   React.useEffect(() => {
     const fetchData = async () => {
         await fetch(`/api/conversations/${conversationId}`)
@@ -27,8 +22,8 @@ const ConversationPage = ({params}: {params:{conversationId: string}}) => {
           return response.json()
         })
         .then((data) => {
-          console.log("datadetails", data)
-          setConversation(data)
+          console.log("setMessages", data)
+          setMessages(data)
         })
         .catch((error) => {
           toast.error(error)
@@ -38,15 +33,14 @@ const ConversationPage = ({params}: {params:{conversationId: string}}) => {
   }, [])
   return (
     <>
-    {/* <InitMessage message={conversation}/> */}
     <ConversationList />
-    {conversation === undefined ?
+    {messages === undefined ?
     <div className='flex justify-center items-center'><Loader2 className='animate-spin'/></div>
     :
-    Object.entries(conversation).length > 0 ?
+    Object.entries(messages).length > 0 ?
     <section className='flex flex-col w-full h-full'>
-      <ConversationHeader conversation={conversation}/>
-      <ConversationBody messages={conversation}/>
+      <ConversationHeader conversation={messages}/>
+      <ConversationBody messages={messages}/>
       <ConversationInput/>
     </section>
   :

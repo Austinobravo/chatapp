@@ -1,9 +1,8 @@
 import { getCurrentUser } from '../../../../lib/serverSessionProvider';
 import { NextRequest, NextResponse } from "next/server";
 import prisma from '@/lib/prisma'
-import { Session } from 'next-auth';
+
 export async function GET(request:NextRequest,{params}: {params:{Id: string}}) {
-    console.log("no userId", params.Id)
     if(!params.Id){
         return NextResponse.json("Forbidden",{status: 403})
     }
@@ -14,8 +13,6 @@ export async function GET(request:NextRequest,{params}: {params:{Id: string}}) {
     if(userId !== accessingUser?.id){
         return NextResponse.json("Forbidden",{status: 403})
     }
-    console.log("userId", userId)
-
     try{
         const foundRequest = await prisma.requests.findMany({
             where: {
@@ -46,8 +43,6 @@ export async function GET(request:NextRequest,{params}: {params:{Id: string}}) {
             const userDetails = request.sender === userId ? request.userReceiver : request.userSender
             return {...request, user:userDetails, conversation: conversation}
         })
-        console.log("updated", updatedRequest)
-
         return NextResponse.json(updatedRequest, {status: 200})
     }
     catch(error){
@@ -137,12 +132,8 @@ export async function PATCH(request:NextRequest,{params}: {params:{Id: string}})
                 }
             })
 
-            console.log('all created',)
-            
             return updatedRequests
         })
-        console.log('all created',updatedRequest)
-        
         return NextResponse.json(updatedRequest, {status: 200})
     }
     catch(error){

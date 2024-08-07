@@ -26,8 +26,8 @@ export async function POST(request: Request, response: NextApiResponse){
         return NextResponse.json('Forbidden', {status: 403})
     }
     try{
-        const newMessage = await prisma.$transaction(async (newPrisma) => {
-            const message = await newPrisma.message.create({
+        const existingConversation = await prisma.$transaction(async (newPrisma) => {
+            await newPrisma.message.create({
                 data: {
                     message: data.message,
                     userId: data.userId,
@@ -35,20 +35,57 @@ export async function POST(request: Request, response: NextApiResponse){
                 }
             })
     
-            await newPrisma.conversations.update({
+            const conversation = await newPrisma.conversations.update({
                 where: {
                     id: data.conversationId,
                 },
                 data: {
                     lastMessage: data.message
+                },
+                include:{
+                    message: true
+                }
+            })
+            
+            return conversation
+            
+        })
+
+        let response;
+
+        if(existingConversation.isGroup){
+            const conversationMember = await prisma.user.findMany({
+                where: {
+                    id:{
+                        in: usersInConversation.map((member) => member.id)
+                    } 
+                }
+            });
+            if (!conversationMember) {
+                return null;
+            }
+            response = {conversationMember,existingConversation}
+        }else{
+            const otherMember = usersInConversation.find((member)=> member?.id !== accessingUser?.id)
+
+            if(!otherMember){
+                return NextResponse.json("Not Found", {status: 404})
+            }
+
+            const otherMemberDetails = await prisma.user.findUnique({
+                where:{
+                    id: otherMember.userId
                 }
             })
 
-            return message
+            if(!otherMemberDetails){
+                return NextResponse.json("Not Found", {status: 404})
+            }
+            
+            response =  {existingConversation, otherMemberDetails}
+        }
 
-        })
-
-        return NextResponse.json(newMessage, {status: 201})
+        return NextResponse.json(response, {status: 201})
 
     }
     catch(error){

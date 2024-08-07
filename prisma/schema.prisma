@@ -65,10 +65,10 @@ model Conversations{
   id String @id @default(uuid())
   name String?
 
-  userId String
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  requestId String
-  request Requests @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  userId String?
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+  requestId String?
+  request Requests? @relation(fields: [requestId], references: [id], onDelete: Cascade)
   friends Friends[]
   lastMessage String?
   createdBy String?

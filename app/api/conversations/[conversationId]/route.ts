@@ -35,19 +35,21 @@ export async function GET(request:NextRequest, {params}: {params:{conversationId
         if(!userInConversation){
             return NextResponse.json("Forbidden", {status: 403})
         }
+
         let response;
 
         if(existingConversation.isGroup){
             const conversationMember = await prisma.user.findMany({
                 where: {
                     id:{
-                        in: conversationMembers.map((member) => member.id)
+                        in: conversationMembers.map((member) => member.userId)
                     } 
                 }
             });
             if (!conversationMember) {
                 return null;
             }
+            console.log("res", conversationMember)
             response = {conversationMember,existingConversation}
         }else{
             const otherMember = conversationMembers.find((member)=> member?.id !== accessingUser?.id)
@@ -65,6 +67,7 @@ export async function GET(request:NextRequest, {params}: {params:{conversationId
             if(!otherMemberDetails){
                 return NextResponse.json("Not Found", {status: 404})
             }
+            
             response =  {existingConversation, otherMemberDetails}
         }
         console.log("filtered", response)
@@ -76,3 +79,4 @@ export async function GET(request:NextRequest, {params}: {params:{conversationId
         return NextResponse.json({status: 505})
     }
 }
+

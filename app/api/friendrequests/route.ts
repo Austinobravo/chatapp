@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { NextResponse } from "next/server";
 import prisma from '@/lib/prisma'
 import { getCurrentUser } from "@/lib/serverSessionProvider";
+
 export async function POST(request: Request, response: NextApiResponse){
     const data = await request.json()
     const accessingUser = await getCurrentUser()
