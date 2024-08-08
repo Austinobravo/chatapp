@@ -49,7 +49,6 @@ export async function GET(request:NextRequest, {params}: {params:{conversationId
             if (!conversationMember) {
                 return null;
             }
-            console.log("res", conversationMember)
             response = {conversationMember,existingConversation}
         }else{
             const otherMember = conversationMembers.find((member)=> member?.id !== accessingUser?.id)

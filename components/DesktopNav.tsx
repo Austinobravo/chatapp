@@ -11,12 +11,15 @@ import { ModeToggle } from './mode-toggle'
 import { useUserStore } from '@/hooks/store/useUserStore'
 import { useSession } from 'next-auth/react'
 import { toast } from 'sonner'
+import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog'
+import LogoutModal from './LogoutModal'
 
 const DesktopNav = () => {
     const paths = useNavigation()
     const {user, setUser} = useUserStore()
     const {data:session} = useSession()
     const userId = session?.user.id
+    const [open, setOpen] = React.useState<boolean>(false)
     
     
     React.useEffect(()=> {
@@ -33,7 +36,6 @@ const DesktopNav = () => {
                         
                 })
                 .then((data: UserType) => {
-                    console.log("setUser", data)
                     setUser(data)
                     })
                 }
@@ -81,14 +83,30 @@ const DesktopNav = () => {
                         <p>Settings</p>
                     </TooltipContent>
                 </Tooltip>
-                <Tooltip>
-                    <TooltipTrigger>
-                        <Image src={`/avatar.webp`} width={50} height={100} alt=''/>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                        <p>Profile</p>
-                    </TooltipContent>
-                </Tooltip>
+                    <Tooltip >
+                        <TooltipTrigger>
+                        <AlertDialog open={open} onOpenChange={setOpen}>
+                            <AlertDialogTrigger asChild>
+                            <Image src={`/avatar.webp`} width={50} height={100} alt=''/>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                <AlertDialogTitle>
+                                Are you sure?
+                                </AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    You'll be logged out.
+                                </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                    <LogoutModal toggle={() => setOpen(!open)}/>
+                                </AlertDialogContent>
+
+                        </AlertDialog>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>Profile</p>
+                        </TooltipContent>
+                    </Tooltip>
             </div>
         </Card>
     </div>

@@ -31,7 +31,6 @@ const FriendCard = () => {
             
         })
         .then((data: RequestType[]) => {
-          console.log('setRequests', data)
             setRequests(data)
         })
     
@@ -64,7 +63,7 @@ const FriendCard = () => {
       //   :
       //   request
       // ) || null)
-      console.log("setRequests", updatedRequests)
+  
       setRequests(updatedRequests)
 
       toast.success('Friend request accepted')

@@ -18,7 +18,6 @@ const ConversationCard = () => {
       })
       if(response.ok){
         const data = await response.json()
-        console.log('setConversationCard', data)
         setConversation(data)
       }
       else{

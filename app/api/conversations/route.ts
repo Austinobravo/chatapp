@@ -100,13 +100,9 @@ export async function POST(request: Request, response: NextApiResponse){
     if(userId !== accessingUser?.id){
         return NextResponse.json('Forbidden', {status: 403})
     }
-    console.log("user", userId)
-    console.log("name", name)
-    console.log("members", members)
 
     try{
-        const newGroupConversation = await prisma.$transaction(async(newPrisma) => {
-            console.log('newconvo')
+        await prisma.$transaction(async(newPrisma) => {
             const conversation = await newPrisma.conversations.create({
                 data: {
                     name: name,
@@ -115,7 +111,6 @@ export async function POST(request: Request, response: NextApiResponse){
                 }
     
             })
-            console.log('convo', conversation)
             const otherMember = await Promise.all([...members, userId].map(async (member) => {
                 await newPrisma.conversationsMembers.create({
                    data:{
@@ -133,16 +128,62 @@ export async function POST(request: Request, response: NextApiResponse){
                return userDetails
     
             }))
-
-            console.log('other', otherMember)
-
             return {conversation, otherMember}
 
         })
-        console.log("newGroup", newGroupConversation)
 
-        return NextResponse.json(newGroupConversation, {status: 201})
+        const getUserConversations = await prisma.conversationsMembers.findMany({
+            orderBy:{
+                createdAt: 'asc'
+            },
+            where: {
+                userId: userId
+            }
+        })
 
+        const conversations =  await Promise.all(getUserConversations?.map(async (members) => {
+            const conversation = await prisma.conversations.findUnique({
+                where: {
+                    id: members.conversationId
+                }
+            });
+            if (!conversation) {
+                return null;
+            }
+            return conversation;
+        }))
+
+        // Filter out any null values that might have been returned for non-existent conversations
+        const filteredConversations = conversations.filter(convo => convo !== null);
+
+
+        const conversationsWithDetails =  await Promise.all( filteredConversations?.map(async(conversation) => {
+            const conversationMembers = await prisma.conversationsMembers.findMany({
+                where:{
+                    conversationId: conversation.id
+                }
+            })
+            if(!conversation){
+                return null
+            }
+            const otherConversationMembers = conversationMembers.find((members) => members.userId !== accessingUser?.id)
+            if (!otherConversationMembers) {
+                return null;
+            }
+            const otherMember = await prisma.user.findUnique({
+                where:{
+                    id: otherConversationMembers.userId
+                }
+            })
+
+            return {conversation, otherMember}
+            
+        }))
+        // Filter out any null values
+        const filteredConversationsWithDetails = conversationsWithDetails.filter(convo => convo !== null);
+
+        return NextResponse.json(filteredConversationsWithDetails, { status: 200 });
+       
     }
     catch(error){
         console.log('err', error)

@@ -146,6 +146,10 @@ export async function DELETE(request:NextRequest, {params}: {params:{Id: string}
     const requestId = params.Id
     const accessingUser = await getCurrentUser()
 
+    if(!accessingUser){
+        return NextResponse.json("Forbidden",{status: 403})
+    }
+
     // if(userId !== accessingUser?.id){
     //     return NextResponse.json("Forbidden",{status: 403})
     // }
@@ -186,9 +190,23 @@ export async function DELETE(request:NextRequest, {params}: {params:{Id: string}
                 id: requestId
             },
         })
+
+        const userCurrentRequest = await prisma.requests.findMany({
+            where: {
+                OR: [
+                    {
+                        sender: accessingUser?.id
+                    },
+                    {
+                        receiver: accessingUser?.id
+                    }
+                ]
+                
+            },    
+        })
         
         
-        return NextResponse.json('Success', {status: 200})
+        return NextResponse.json(userCurrentRequest, {status: 200})
     }
     catch(error){
         console.log('error', error)

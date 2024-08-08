@@ -145,7 +145,6 @@ const ConversationBody = ({messages}: {messages:UpdatedConversationType}) => {
     const formatTime = (timestamp: number) => {
         return format(timestamp, 'HH:mm')
     }
-   console.log("converstionbody", messages)
   return (
 
     <Card className='no-scrollbar overflow-y-scroll flex flex-col-reverse flex-1  gap-2 p-3 ml-16 w-[calc(100%_-_4rem)] lg:!ml-[24rem] lg:w-[calc(100%_-_24rem)] bg-transparent dark:bg-black mt-20 mb-24 shadow-none border-0'>

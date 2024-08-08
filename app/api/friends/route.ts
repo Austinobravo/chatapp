@@ -9,12 +9,9 @@ export async function GET(request:NextRequest,{params}: {params:{Id: string}}) {
     const userId = params.Id
     const accessingUser = await getCurrentUser()
 
-    console.log("userId", userId)
-
     if(userId !== accessingUser?.id){
         return NextResponse.json("Forbidden",{status: 403})
     }
-    console.log("true", userId)
 
     try{
         
@@ -31,7 +28,6 @@ export async function GET(request:NextRequest,{params}: {params:{Id: string}}) {
                 
             },   
         })
-        console.log("friends", friends)
 
         if(!friends){
             return NextResponse.json("No friends", {status: 404})
@@ -46,8 +42,6 @@ export async function GET(request:NextRequest,{params}: {params:{Id: string}}) {
             }
         });
 
-
-        console.log("friendsDetails", friendsDetails)
         return NextResponse.json(friendsDetails, {status: 200})
     }
     catch(error){

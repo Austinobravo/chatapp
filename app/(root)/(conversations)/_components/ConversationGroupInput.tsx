@@ -47,7 +47,6 @@ const ConversationGroupInput = () => {
             })
             if(response.ok){
               const data = await response.json()
-              console.log('setfriendCard', data)
               setFriends(data)
             }
             else{
@@ -78,12 +77,10 @@ const ConversationGroupInput = () => {
                 return response.json()
             })
             .then((data) => {
-                if(data){
                     setConversation(data)
                     toast.success("Group created")
                     form.reset()
                     setOpen(!open) 
-                }
             })
             .catch((error) => {
                 toast.error(error)
