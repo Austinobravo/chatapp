@@ -62,7 +62,7 @@ export async function POST(request: Request, response: NextApiResponse){
                 }
             });
             if (!conversationMember) {
-                return null;
+                return  NextResponse.json("Not Found", {status: 404});
             }
             response = {conversationMember,existingConversation}
         }else{

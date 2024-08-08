@@ -47,7 +47,7 @@ export async function GET(request:NextRequest, {params}: {params:{conversationId
                 }
             });
             if (!conversationMember) {
-                return null;
+                return NextResponse.json("Not Found", {status: 404});
             }
             response = {conversationMember,existingConversation}
         }else{
@@ -69,7 +69,7 @@ export async function GET(request:NextRequest, {params}: {params:{conversationId
             
             response =  {existingConversation, otherMemberDetails}
         }
-        console.log("filtered", response)
+
         return NextResponse.json(response, {status: 200})
 
     }
